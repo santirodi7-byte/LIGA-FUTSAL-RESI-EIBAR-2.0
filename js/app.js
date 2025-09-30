@@ -424,12 +424,14 @@ mostrarPartidos(partidos, containerId) {
     async editarEquipo(id) {
         if (!this.isAdmin) return;
         
+        console.log('=== INICIANDO editarEquipo ==='); // ← AQUÍ
+    
         const equipos = await this.db.getEquipos();
         const equipo = equipos.find(e => e.id === id);
-        
+    
+        console.log('Equipo encontrado:', equipo); // ← Y AQUÍ
+    
         const nuevoNombre = prompt("Nuevo nombre:", equipo.nombre);
-        const nuevaCiudad = prompt("Nueva ciudad:", equipo.ciudad);
-        const nuevoEntrenador = prompt("Nuevo entrenador:", equipo.entrenador);
         
         if (nuevoNombre) {
             const equipoActualizado = {
@@ -441,11 +443,17 @@ mostrarPartidos(partidos, containerId) {
             
             const transaction = this.db.transaction(['equipos'], 'readwrite');
             const store = transaction.objectStore('equipos');
-            await store.put(equipoActualizado);
             
-            // === AÑADIR ESTO ===
-            this.cargarEquipos(); // Recargar lista equipos
-            this.cargarClasificacion(); // Recargar tabla
+            // ESPERAR a que se complete la transacción
+            await new Promise((resolve, reject) => {
+                const request = store.put(equipoActualizado);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+            
+            // ESPERAR a que se recarguen los datos
+            await this.cargarEquipos();
+            await this.cargarClasificacion();
             this.mostrarMensaje('Equipo actualizado');
         }
     }   
@@ -463,13 +471,16 @@ mostrarPartidos(partidos, containerId) {
 
     async editarResultadoPartido(id) {
         if (!this.isAdmin) return;
-        
+       
+        console.log('=== INICIANDO editarResultadoPartido ==='); // ← AQUÍ
+    
         const partidos = await this.db.getPartidos();
         const partido = partidos.find(p => p.id === id);
-        
+    
+        console.log('Partido encontrado:', partido); // ← Y AQUÍ
+    
         const golesLocal = prompt("Goles local:", partido.golesLocal || 0);
-        const golesVisitante = prompt("Goles visitante:", partido.golesVisitante || 0);
-        
+
         if (golesLocal !== null && golesVisitante !== null) {
             const partidoActualizado = {
                 ...partido,
@@ -480,9 +491,17 @@ mostrarPartidos(partidos, containerId) {
             
             const transaction = this.db.transaction(['partidos'], 'readwrite');
             const store = transaction.objectStore('partidos');
-            await store.put(partidoActualizado);
-            this.cargarPartidos(); 
-            this.cargarClasificacion(); 
+            
+            // ESPERAR a que se complete
+            await new Promise((resolve, reject) => {
+                const request = store.put(partidoActualizado);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+            
+            // ESPERAR a que se recarguen
+            await this.cargarPartidos();
+            await this.cargarClasificacion();
             this.mostrarMensaje('Resultado actualizado');
         }
     }
