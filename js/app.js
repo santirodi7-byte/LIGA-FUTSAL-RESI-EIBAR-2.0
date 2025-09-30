@@ -159,7 +159,7 @@ class FutsalApp {
         this.mostrarPartidos(partidosProximos, 'proximos-partidos');
         this.mostrarPartidos(partidosJugados, 'partidos-jugados');
     }
-    
+
 mostrarPartidos(partidos, containerId) {
     const container = document.getElementById(containerId);
     
@@ -365,6 +365,7 @@ mostrarPartidos(partidos, containerId) {
         alert(mensaje);
     }
         checkAdmin() {
+        alert('Botón funcionando');
         const password = prompt("Introduce la contraseña de admin:");
         this.isAdmin = (password === this.adminPassword);
         
