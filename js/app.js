@@ -422,11 +422,7 @@ mostrarPartidos(partidos, containerId) {
     }
 
     async editarEquipo(id) {
-        console.log('eliminarEquipo llamado con id:', id); // ← Añadir
-        if (!this.isAdmin) {
-        console.log('No es admin');
-        return;
-        }
+        if (!this.isAdmin) return;
         
         const equipos = await this.db.getEquipos();
         const equipo = equipos.find(e => e.id === id);
@@ -446,10 +442,13 @@ mostrarPartidos(partidos, containerId) {
             const transaction = this.db.transaction(['equipos'], 'readwrite');
             const store = transaction.objectStore('equipos');
             await store.put(equipoActualizado);
-            this.cargarEquipos();
-            this.cargarClasificacion();
+            
+            // === AÑADIR ESTO ===
+            this.cargarEquipos(); // Recargar lista equipos
+            this.cargarClasificacion(); // Recargar tabla
+            this.mostrarMensaje('Equipo actualizado');
         }
-    }
+    }   
 
     async eliminarPartido(id) {
         if (!this.isAdmin) return;
@@ -482,8 +481,9 @@ mostrarPartidos(partidos, containerId) {
             const transaction = this.db.transaction(['partidos'], 'readwrite');
             const store = transaction.objectStore('partidos');
             await store.put(partidoActualizado);
-            this.cargarPartidos();
-            this.cargarClasificacion();
+            this.cargarPartidos(); 
+            this.cargarClasificacion(); 
+            this.mostrarMensaje('Resultado actualizado');
         }
     }
    
