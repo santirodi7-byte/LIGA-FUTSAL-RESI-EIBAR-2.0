@@ -263,3 +263,41 @@ button[type="submit"]:hover {
     border-radius: 5px;
     cursor: pointer;
 }
+
+.admin-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.admin-btn:hover {
+    opacity: 1;
+}
+
+/* Botones de acciones admin */
+.admin-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.admin-actions button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.admin-actions button:hover {
+    background: #f57c00;
+}

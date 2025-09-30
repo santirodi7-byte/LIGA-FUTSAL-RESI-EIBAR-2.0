@@ -1,6 +1,8 @@
 class FutsalApp {
     constructor() {
         this.db = db;
+        this.isAdmin = false; // ← AÑADIR ESTO
+        this.adminPassword = "futsal2024"; // ← Y ESTO
         this.init();
     }
 
@@ -58,6 +60,9 @@ class FutsalApp {
             if (e.target.classList.contains('modal')) {
                 this.cerrarModales();
             }
+        });
+        document.getElementById('secret-admin-btn').addEventListener('click', () => {
+        this.checkAdmin();
         });
     }
 
@@ -123,6 +128,12 @@ class FutsalApp {
                 <p><strong>Ciudad:</strong> ${equipo.ciudad}</p>
                 <p><strong>Entrenador:</strong> ${equipo.entrenador}</p>
                 <p><strong>Puntos:</strong> ${equipo.puntos || 0}</p>
+                ${this.isAdmin ? `
+                <div class="admin-actions">
+                    <button onclick="app.editarEquipo(${equipo.id})">✏️ Editar</button>
+                    <button onclick="app.eliminarEquipo(${equipo.id})">🗑️ Eliminar</button>
+                </div>
+                ` : ''}
             </div>
         `).join('');
     }
@@ -148,50 +159,64 @@ class FutsalApp {
         this.mostrarPartidos(partidosProximos, 'proximos-partidos');
         this.mostrarPartidos(partidosJugados, 'partidos-jugados');
     }
-
-    mostrarPartidos(partidos, containerId) {
-        const container = document.getElementById(containerId);
-        
-        if (partidos.length === 0) {
-            container.innerHTML = '<p>No hay partidos registrados</p>';
-            return;
-        }
-
-        container.innerHTML = partidos.map(partido => {
-            const fecha = new Date(partido.fecha).toLocaleDateString('es-ES', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            if (partido.jugado || (partido.golesLocal !== null && partido.golesVisitante !== null)) {
-                return `
-                    <div class="partido-card">
-                        <div class="partido-info">
-                            <span>${partido.localNombre}</span>
-                            <span class="resultado">${partido.golesLocal} - ${partido.golesVisitante}</span>
-                            <span>${partido.visitanteNombre}</span>
-                        </div>
-                        <p><small>${fecha}</small></p>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="partido-card">
-                        <div class="partido-info">
-                            <span>${partido.localNombre}</span>
-                            <span class="resultado">vs</span>
-                            <span>${partido.visitanteNombre}</span>
-                        </div>
-                        <p><small>${fecha}</small></p>
-                    </div>
-                `;
-            }
-        }).join('');
+    
+mostrarPartidos(partidos, containerId) {
+    const container = document.getElementById(containerId);
+    
+    if (partidos.length === 0) {
+        container.innerHTML = '<p>No hay partidos registrados</p>';
+        return;
     }
+
+    container.innerHTML = partidos.map(partido => {
+        const fecha = new Date(partido.fecha).toLocaleDateString('es-ES', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        let resultadoHTML = '';
+        if (partido.jugado || (partido.golesLocal !== null && partido.golesVisitante !== null)) {
+            resultadoHTML = `
+                <div class="partido-card">
+                    <div class="partido-info">
+                        <span>${partido.localNombre}</span>
+                        <span class="resultado">${partido.golesLocal} - ${partido.golesVisitante}</span>
+                        <span>${partido.visitanteNombre}</span>
+                    </div>
+                    <p><small>${fecha}</small></p>
+                    ${this.isAdmin ? `
+                    <div class="admin-actions">
+                        <button onclick="app.editarResultadoPartido(${partido.id})">✏️ Resultado</button>
+                        <button onclick="app.eliminarPartido(${partido.id})">🗑️ Eliminar</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        } else {
+            resultadoHTML = `
+                <div class="partido-card">
+                    <div class="partido-info">
+                        <span>${partido.localNombre}</span>
+                        <span class="resultado">vs</span>
+                        <span>${partido.visitanteNombre}</span>
+                    </div>
+                    <p><small>${fecha}</small></p>
+                    ${this.isAdmin ? `
+                    <div class="admin-actions">
+                        <button onclick="app.editarResultadoPartido(${partido.id})">✏️ Resultado</button>
+                        <button onclick="app.eliminarPartido(${partido.id})">🗑️ Eliminar</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        return resultadoHTML;
+    }).join('');
+}
 
     async agregarEquipo() {
         const nombre = document.getElementById('equipo-nombre').value;
@@ -339,6 +364,97 @@ class FutsalApp {
         // Implementación simple de mensajes
         alert(mensaje);
     }
+        checkAdmin() {
+        const password = prompt("Introduce la contraseña de admin:");
+        this.isAdmin = (password === this.adminPassword);
+        
+        if (this.isAdmin) {
+            this.mostrarBotonesAdmin();
+            alert("Modo admin activado");
+        } else {
+            alert("Contraseña incorrecta");
+        }
+    }
+
+    mostrarBotonesAdmin() {
+        this.cargarEquipos();
+        this.cargarPartidos();
+    }
+
+    async eliminarEquipo(id) {
+        if (!this.isAdmin) return;
+        if (confirm("¿Estás seguro de eliminar este equipo?")) {
+            const transaction = this.db.transaction(['equipos'], 'readwrite');
+            const store = transaction.objectStore('equipos');
+            await store.delete(id);
+            this.cargarEquipos();
+            this.cargarClasificacion();
+            this.mostrarMensaje('Equipo eliminado');
+        }
+    }
+
+    async editarEquipo(id) {
+        if (!this.isAdmin) return;
+        
+        const equipos = await this.db.getEquipos();
+        const equipo = equipos.find(e => e.id === id);
+        
+        const nuevoNombre = prompt("Nuevo nombre:", equipo.nombre);
+        const nuevaCiudad = prompt("Nueva ciudad:", equipo.ciudad);
+        const nuevoEntrenador = prompt("Nuevo entrenador:", equipo.entrenador);
+        
+        if (nuevoNombre) {
+            const equipoActualizado = {
+                ...equipo,
+                nombre: nuevoNombre,
+                ciudad: nuevaCiudad,
+                entrenador: nuevoEntrenador
+            };
+            
+            const transaction = this.db.transaction(['equipos'], 'readwrite');
+            const store = transaction.objectStore('equipos');
+            await store.put(equipoActualizado);
+            this.cargarEquipos();
+            this.cargarClasificacion();
+        }
+    }
+
+    async eliminarPartido(id) {
+        if (!this.isAdmin) return;
+        if (confirm("¿Eliminar este partido?")) {
+            const transaction = this.db.transaction(['partidos'], 'readwrite');
+            const store = transaction.objectStore('partidos');
+            await store.delete(id);
+            this.cargarPartidos();
+            this.cargarClasificacion();
+        }
+    }
+
+    async editarResultadoPartido(id) {
+        if (!this.isAdmin) return;
+        
+        const partidos = await this.db.getPartidos();
+        const partido = partidos.find(p => p.id === id);
+        
+        const golesLocal = prompt("Goles local:", partido.golesLocal || 0);
+        const golesVisitante = prompt("Goles visitante:", partido.golesVisitante || 0);
+        
+        if (golesLocal !== null && golesVisitante !== null) {
+            const partidoActualizado = {
+                ...partido,
+                golesLocal: parseInt(golesLocal),
+                golesVisitante: parseInt(golesVisitante),
+                jugado: true
+            };
+            
+            const transaction = this.db.transaction(['partidos'], 'readwrite');
+            const store = transaction.objectStore('partidos');
+            await store.put(partidoActualizado);
+            this.cargarPartidos();
+            this.cargarClasificacion();
+        }
+    }
+   
 }
 
 // Inicializar la app cuando el DOM esté listo
