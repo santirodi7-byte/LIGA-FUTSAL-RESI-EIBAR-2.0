@@ -369,6 +369,8 @@ mostrarPartidos(partidos, containerId) {
         const password = prompt("Introduce la contraseña de admin:");
         this.isAdmin = (password === this.adminPassword);
         
+        console.log('isAdmin después de check:', this.isAdmin);
+        
         if (this.isAdmin) {
             this.mostrarBotonesAdmin();
             alert("Modo admin activado");
@@ -383,7 +385,11 @@ mostrarPartidos(partidos, containerId) {
     }
 
     async eliminarEquipo(id) {
-        if (!this.isAdmin) return;
+        console.log('eliminarEquipo llamado con id:', id); // ← Añadir
+        if (!this.isAdmin) {
+            console.log('No es admin');
+            return;
+        }
         if (confirm("¿Estás seguro de eliminar este equipo?")) {
             const transaction = this.db.transaction(['equipos'], 'readwrite');
             const store = transaction.objectStore('equipos');
@@ -395,7 +401,11 @@ mostrarPartidos(partidos, containerId) {
     }
 
     async editarEquipo(id) {
-        if (!this.isAdmin) return;
+        console.log('eliminarEquipo llamado con id:', id); // ← Añadir
+        if (!this.isAdmin) {
+        console.log('No es admin');
+        return;
+        }
         
         const equipos = await this.db.getEquipos();
         const equipo = equipos.find(e => e.id === id);
@@ -459,6 +469,8 @@ mostrarPartidos(partidos, containerId) {
 }
 
 // Inicializar la app cuando el DOM esté listo
+let app;
 document.addEventListener('DOMContentLoaded', () => {
-    new FutsalApp();
+    app = new FutsalApp();
+    window.app = app; // ← Hacer app global
 });
