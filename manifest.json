@@ -1,8 +1,8 @@
 {
-  "name": "Liga Fútbol Sala",
+  "name": "Liga Futsal Resi Eibar",
   "short_name": "Liga Futsal",
-  "description": "Sigue los resultados de tu liga de fútbol sala",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#2E7D32",
   "theme_color": "#2E7D32",

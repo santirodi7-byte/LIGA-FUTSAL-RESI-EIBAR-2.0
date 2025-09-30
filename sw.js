@@ -1,14 +1,14 @@
 const CACHE_NAME = 'futsal-league-v1';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/css/style.css',
-    '/js/app.js',
-    '/js/db.js',
-    '/js/sw-register.js',
-    '/manifest.json',
-    '/icons/icon-72x72.png',
-    '/icons/icon-192x192.png'
+    './',
+    './index.html',
+    './css/style.css',
+    './js/app.js',
+    './js/db.js',
+    './js/sw-register.js',
+    './manifest.json',
+    './icons/icon-72x72.png',
+    './icons/icon-192x192.png'
 ];
 
 self.addEventListener('install', function(event) {
