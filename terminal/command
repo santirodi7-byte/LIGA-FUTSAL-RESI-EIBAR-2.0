@@ -1,0 +1,4 @@
+bash
+git init
+git add .
+git commit -m "Initial commit: Futsal League PWA App"

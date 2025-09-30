@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga Fútbol Sala</title>
+    <meta name="description" content="Sigue los resultados de tu liga de fútbol sala">
+    <meta name="theme-color" content="#2E7D32">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Liga Futsal">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="icons/icon-72x72.png">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏆 Liga Fútbol Sala</h1>
+            <nav class="tabs">
+                <button class="tab-button active" data-tab="clasificacion">Clasificación</button>
+                <button class="tab-button" data-tab="partidos">Partidos</button>
+                <button class="tab-button" data-tab="equipos">Equipos</button>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <!-- Tab Clasificación -->
+            <div id="clasificacion" class="tab-content active">
+                <h2>Clasificación</h2>
+                <div class="table-container">
+                    <table id="clasificacion-table">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Equipo</th>
+                                <th>PJ</th>
+                                <th>PG</th>
+                                <th>PE</th>
+                                <th>PP</th>
+                                <th>GF</th>
+                                <th>GC</th>
+                                <th>Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clasificacion-body">
+                            <!-- Datos cargados dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Partidos -->
+            <div id="partidos" class="tab-content">
+                <h2>Próximos Partidos</h2>
+                <div id="proximos-partidos" class="partidos-list">
+                    <!-- Partidos próximos -->
+                </div>
+                
+                <h2>Partidos Jugados</h2>
+                <div id="partidos-jugados" class="partidos-list">
+                    <!-- Partidos jugados -->
+                </div>
+                
+                <button id="add-partido-btn" class="floating-btn">+</button>
+            </div>
+
+            <!-- Tab Equipos -->
+            <div id="equipos" class="tab-content">
+                <h2>Equipos</h2>
+                <div id="equipos-list" class="equipos-grid">
+                    <!-- Lista de equipos -->
+                </div>
+                <button id="add-equipo-btn" class="floating-btn">+</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para añadir equipo -->
+    <div id="equipo-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Añadir Equipo</h3>
+            <form id="equipo-form">
+                <input type="text" id="equipo-nombre" placeholder="Nombre del equipo" required>
+                <input type="text" id="equipo-ciudad" placeholder="Ciudad">
+                <input type="text" id="equipo-entrenador" placeholder="Entrenador">
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para añadir partido -->
+    <div id="partido-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Añadir Partido</h3>
+            <form id="partido-form">
+                <select id="local-equipo" required>
+                    <option value="">Equipo local</option>
+                </select>
+                <select id="visitante-equipo" required>
+                    <option value="">Equipo visitante</option>
+                </select>
+                <input type="number" id="goles-local" placeholder="Goles local" min="0">
+                <input type="number" id="goles-visitante" placeholder="Goles visitante" min="0">
+                <input type="datetime-local" id="fecha-partido" required>
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/sw-register.js"></script>
+</body>
+</html>
