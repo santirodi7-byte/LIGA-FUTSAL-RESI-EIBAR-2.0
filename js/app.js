@@ -64,6 +64,27 @@ class FutsalApp {
         document.getElementById('secret-admin-btn').addEventListener('click', () => {
         this.checkAdmin();
         });
+        document.addEventListener('click', (e) => {
+        // Botones de equipos
+        if (e.target.classList.contains('btn-editar-equipo')) {
+            const id = parseInt(e.target.dataset.id);
+            this.editarEquipo(id);
+        }
+        if (e.target.classList.contains('btn-eliminar-equipo')) {
+            const id = parseInt(e.target.dataset.id);
+            this.eliminarEquipo(id);
+        }
+        
+        // Botones de partidos
+        if (e.target.classList.contains('btn-editar-partido')) {
+            const id = parseInt(e.target.dataset.id);
+            this.editarResultadoPartido(id);
+        }
+        if (e.target.classList.contains('btn-eliminar-partido')) {
+            const id = parseInt(e.target.dataset.id);
+            this.eliminarPartido(id);
+        }
+        });
     }
 
     cambiarTab(tabName) {
@@ -130,8 +151,8 @@ class FutsalApp {
                 <p><strong>Puntos:</strong> ${equipo.puntos || 0}</p>
                 ${this.isAdmin ? `
                 <div class="admin-actions">
-                    <button onclick="app.editarEquipo(${equipo.id})">✏️ Editar</button>
-                    <button onclick="app.eliminarEquipo(${equipo.id})">🗑️ Eliminar</button>
+                <button class="btn-editar-equipo" data-id="${equipo.id}">✏️ Editar</button>
+                <button class="btn-eliminar-equipo" data-id="${equipo.id}">🗑️ Eliminar</button>
                 </div>
                 ` : ''}
             </div>
@@ -190,8 +211,8 @@ mostrarPartidos(partidos, containerId) {
                     <p><small>${fecha}</small></p>
                     ${this.isAdmin ? `
                     <div class="admin-actions">
-                        <button onclick="app.editarResultadoPartido(${partido.id})">✏️ Resultado</button>
-                        <button onclick="app.eliminarPartido(${partido.id})">🗑️ Eliminar</button>
+                        <button class="btn-editar-partido" data-id="${partido.id}">✏️ Resultado</button>
+                        <button class="btn-eliminar-partido" data-id="${partido.id}">🗑️ Eliminar</button>
                     </div>
                     ` : ''}
                 </div>
@@ -207,8 +228,8 @@ mostrarPartidos(partidos, containerId) {
                     <p><small>${fecha}</small></p>
                     ${this.isAdmin ? `
                     <div class="admin-actions">
-                        <button onclick="app.editarResultadoPartido(${partido.id})">✏️ Resultado</button>
-                        <button onclick="app.eliminarPartido(${partido.id})">🗑️ Eliminar</button>
+                        <button class="btn-editar-partido" data-id="${partido.id}">✏️ Resultado</button>
+                        <button class="btn-eliminar-partido" data-id="${partido.id}">🗑️ Eliminar</button>
                     </div>
                     ` : ''}
                 </div>
@@ -370,7 +391,7 @@ mostrarPartidos(partidos, containerId) {
         this.isAdmin = (password === this.adminPassword);
         
         console.log('isAdmin después de check:', this.isAdmin);
-        
+
         if (this.isAdmin) {
             this.mostrarBotonesAdmin();
             alert("Modo admin activado");
